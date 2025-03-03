@@ -30,14 +30,19 @@ for (let i = 0; i < attempts; i++) {
     stdout: "pipe",
     cwd: __dirname,
   });
-  await Promise.race([proc.exited, new Promise(resolve => setTimeout(resolve, 5000).unref())]);
+  await Promise.race([proc.exited, new Promise(resolve => setTimeout(resolve, 60000).unref())]);
   if (proc.exitCode === null) {
     proc.kill("SIGKILL");
   }
   const stdout = await new Response(proc.stdout).text();
   const stderr = await new Response(proc.stderr).text();
   if (stderr.length > 0 || proc.exitCode !== 0 || !stdout.match(ok)) {
-    console.log(proc.exitCode, stdout, stderr);
+    if (proc.exitCode === null) {
+      console.log("terminated by", proc.signalCode);
+    } else {
+      console.log("exited with",proc.exitCode);
+    }
+    console.log("stdout:", stdout, "stderr:", stderr);
     fails++;
     if (proc.signalCode !== null) {
       failureModes[proc.signalCode] ??= 0;
