@@ -30,7 +30,7 @@ for (let i = 0; i < attempts; i++) {
     stdout: "pipe",
     cwd: __dirname,
   });
-  await Promise.race([proc.exited, new Promise(resolve => setTimeout(resolve, 15000).unref())]);
+  await Promise.race([proc.exited, new Promise(resolve => setTimeout(resolve, 5000).unref())]);
   if (proc.exitCode === null) {
     proc.kill("SIGKILL");
   }
