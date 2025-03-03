@@ -2,7 +2,9 @@ import { TYPE_NAMES } from '../compiler/types.js';
 import compile from '../compiler/wrap.js';
 import parse from '../compiler/parse.js';
 
-import util from 'node:util';
+const util = typeof process == 'object' && process.versions?.node
+  ? await import('node:util')
+  : { inspect: JSON.stringify };
 
 Prefs.optUnused = false;
 
@@ -16,7 +18,9 @@ try {
     throw 'mock node:repl detected';
 } catch {
   // it failed, import the polyfill
-  repl = (await import('node-repl-polyfill')).default;
+  try {
+    repl = (await import('node-repl-polyfill')).default;
+  } catch {}
 }
 
 globalThis.valtype = Prefs.valtype ?? 'f64';

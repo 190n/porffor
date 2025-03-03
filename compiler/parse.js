@@ -16,7 +16,7 @@ globalThis.parser = '';
 let parse;
 const loadParser = async (fallbackParser = 'acorn', forceParser) => {
   parser = forceParser ?? Prefs.parser ?? fallbackParser;
-  0, { parse } = (await import((globalThis.document || globalThis.Deno ? 'https://esm.sh/' : '') + parser));
+  0, { parse } = (await import((globalThis.document || globalThis.Deno ? 'https://esm.sh/' : (globalThis.print ? '../node_modules/acorn/dist/' : '')) + parser + (globalThis.print ? '.mjs' : '')));
 };
 globalThis._porf_loadParser = loadParser;
 await loadParser(types ? '@babel/parser' : undefined);

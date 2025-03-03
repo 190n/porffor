@@ -1,10 +1,24 @@
 #!/usr/bin/env node
-import fs from 'node:fs';
+const fs = typeof process === 'object' && process.versions?.node
+  ? await import('node:fs')
+  : {
+    readFileSync(file, encoding) {
+      if (encoding !== 'utf8') {
+        throw new Error('not implemented');
+      }
+      return readFile(file);
+    }
+  };
+if (typeof console === 'undefined') {
+  globalThis.console = { log: print, error: print };
+}
 globalThis.version = '0.55.35';
 
 // deno compat
 if (typeof process === 'undefined' && typeof Deno !== 'undefined') {
   globalThis.process = await import('node:process');
+} else if (typeof process === 'undefined') {
+  globalThis.process = { argv: ['jsc', 'runner/index.js', 'bench/richards.js'], stdout: { write: print } };
 }
 
 const start = performance.now();
