@@ -39,7 +39,7 @@ for (let i = 0; i < attempts; i++) {
   if (stderr.length > 0 || proc.exitCode !== 0 || !stdout.match(ok)) {
     console.log(proc.exitCode, stdout, stderr);
     fails++;
-    if (stderr.includes("Bun has crashed")) {
+    if (stderr.includes("Bun has crashed") || ['SIGSEGV', 'SIGTRAP', 'SIGBUS'].includes(proc.signalCode)) {
       failureModes.crash++;
     } else if (stderr.includes("Out of bounds")) {
       failureModes.oob++;
