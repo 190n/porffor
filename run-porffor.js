@@ -30,7 +30,7 @@ for (let i = 0; i < attempts; i++) {
     stdout: "pipe",
     cwd: __dirname,
   });
-  await Promise.race([proc.exited, new Promise(resolve => setTimeout(resolve, 5000).unref())]);
+  await Promise.race([proc.exited, new Promise(resolve => setTimeout(resolve, 15000).unref())]);
   if (proc.exitCode === null) {
     proc.kill("SIGKILL");
   }
@@ -39,7 +39,10 @@ for (let i = 0; i < attempts; i++) {
   if (stderr.length > 0 || proc.exitCode !== 0 || !stdout.match(ok)) {
     console.log(proc.exitCode, stdout, stderr);
     fails++;
-    if (stderr.includes("Bun has crashed") || ['SIGSEGV', 'SIGTRAP', 'SIGBUS'].includes(proc.signalCode)) {
+    if (proc.signalCode !== null) {
+      failureModes[proc.signalCode] ??= 0;
+      failureModes[proc.signalCode]++;
+    } else if (stderr.includes("Bun has crashed")) {
       failureModes.crash++;
     } else if (stderr.includes("Out of bounds")) {
       failureModes.oob++;
